@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clean Mic</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <section class="top">
+      <button id="power" class="power on" aria-pressed="true" title="Turn cleaning on/off">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="9" y="3" width="6" height="11" rx="3" />
+          <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6" />
+        </svg>
+        <span id="power-label">ON</span>
+      </button>
+      <div class="top-side">
+        <h1>Clean Mic</h1>
+        <p id="status" class="status">Starting…</p>
+        <div class="meter">
+          <label>Your mic</label>
+          <div class="bar"><div id="m-in"></div></div>
+        </div>
+        <div class="meter">
+          <label>What others hear</label>
+          <div class="bar"><div id="m-out" class="clean"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="cable-hint" class="hint" hidden>
+      To use this in Discord, OBS, games, etc. install the free
+      <a href="https://vb-audio.com/Cable/" target="_blank">VB-Audio Virtual Cable</a>,
+      then restart Clean Mic.
+    </div>
+    <p id="use-hint" class="hint soft" hidden>
+      In Discord / OBS / games, choose <b>CABLE Output</b> as your microphone.
+    </p>
+
+    <section class="card">
+      <h2>Voice style</h2>
+      <div id="presets" class="chips" role="radiogroup"></div>
+      <p id="preset-desc" class="desc"></p>
+
+      <div class="tone">
+        <div class="tone-row">
+          <label for="t-bass">Bass <small>depth</small></label>
+          <input id="t-bass" type="range" min="-12" max="12" step="0.5" data-band="0" />
+          <output id="o-bass"></output>
+        </div>
+        <div class="tone-row">
+          <label for="t-mid">Mid <small>body</small></label>
+          <input id="t-mid" type="range" min="-12" max="12" step="0.5" data-band="2" />
+          <output id="o-mid"></output>
+        </div>
+        <div class="tone-row">
+          <label for="t-treble">Treble <small>clarity</small></label>
+          <input id="t-treble" type="range" min="-12" max="12" step="0.5" data-band="4" />
+          <output id="o-treble"></output>
+        </div>
+      </div>
+
+      <details id="pro" class="pro">
+        <summary>Pro EQ</summary>
+        <canvas id="eq" height="170"></canvas>
+        <p class="desc">Drag a dot to shape your voice. Scroll on a dot to make it wider or narrower. Double-click to reset it.</p>
+        <div id="band-info" class="band-info"></div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>Loudness</h2>
+      <input id="loudness" type="range" min="0" max="100" value="50" />
+      <div class="ticks"><span>Quieter</span><span>Louder</span></div>
+
+      <h2 class="gap">Background noise removal</h2>
+      <input id="strength" type="range" min="0" max="100" value="70" />
+      <div class="ticks"><span>Gentle</span><span>Strong</span></div>
+
+      <div class="row toggles">
+        <label class="switch"><input id="echo" type="checkbox" checked /><span></span> Remove speaker echo</label>
+      </div>
+      <p id="echo-desc" class="desc">Stops people from hearing themselves when you use speakers instead of headphones.</p>
+
+      <div class="row toggles">
+        <label class="switch"><input id="monitor" type="checkbox" /><span></span> Hear myself</label>
+        <button id="compare" class="ghost" title="Hold to hear your mic without any processing">Hold to hear original</button>
+      </div>
+    </section>
+
+    <details class="card devices">
+      <summary>Devices</summary>
+      <label for="input">Microphone</label>
+      <select id="input"></select>
+      <label for="output">Send clean voice to</label>
+      <select id="output"></select>
+    </details>
+  </main>
+  <script src="main.js"></script>
+</body>
+</html>

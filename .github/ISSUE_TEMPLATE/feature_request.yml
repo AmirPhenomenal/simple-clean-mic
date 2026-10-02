@@ -1,0 +1,19 @@
+name: Feature request
+description: Suggest an idea for Clean Mic
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: Describe the problem or situation, not only the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could Clean Mic help?
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?

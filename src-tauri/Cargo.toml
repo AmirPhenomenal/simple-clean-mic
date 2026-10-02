@@ -2,6 +2,9 @@
 name = "simple-clean-mic"
 version = "0.1.0"
 edition = "2021"
+description = "Free, open-source AI noise cancellation for your microphone on Windows"
+license = "MIT"
+repository = "https://github.com/AmirPhenomenal/simple-clean-mic"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

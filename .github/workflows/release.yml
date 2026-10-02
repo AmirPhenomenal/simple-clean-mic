@@ -1,0 +1,70 @@
+name: Release
+
+# Runs when a version tag is pushed (see scripts/release.mjs):
+#   npm run release patch && git push --follow-tags
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag matches package.json
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      # tauri-build checks that the bundled resources exist, even for tests
+      - run: node scripts/fetch-vbcable.mjs
+
+      - name: Run tests
+        working-directory: src-tauri
+        run: cargo test --release
+
+      - name: Build installer and create GitHub Release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # signs the update files so the app's auto-updater trusts them (see README)
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Clean Mic ${{ github.ref_name }}
+          releaseBody: |
+            ## Install
+            1. Download **Clean.Mic_*_x64-setup.exe** below and run it.
+            2. The installer offers to install VB-CABLE if you don't have it (needed for Discord, OBS, games, etc.). Restart your PC afterwards.
+            3. In Discord, OBS, games, etc. pick **CABLE Output** as your microphone.
+
+            Already installed? Clean Mic updates itself, no need to download again.
+
+            Windows may show a SmartScreen warning because the installer is not code-signed: click **More info → Run anyway**.
+
+            VB-CABLE is made by VB-Audio ([www.vb-cable.com](https://vb-cable.com)). It is donationware, all participations are welcome.
+          generateReleaseNotes: true
+          releaseDraft: true
+          includeUpdaterJson: true

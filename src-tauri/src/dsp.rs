@@ -13,10 +13,6 @@ fn db_to_lin(db: f32) -> f32 {
     10f32.powf(db / 20.0)
 }
 
-fn lin_to_db(x: f32) -> f32 {
-    20.0 * x.max(1e-9).log10()
-}
-
 /// One-pole smoothing coefficient for a time constant in milliseconds (per sample).
 fn coef(ms: f32) -> f32 {
     (-1.0 / (ms * 0.001 * SAMPLE_RATE)).exp()
@@ -248,8 +244,8 @@ impl Chain {
         let agc_c = coef(400.0);
 
         // compressor: -18 dBFS threshold, 3:1 (tames peaks; auto gain already sets the level)
-        let comp_thresh = -18.0;
-        let comp_ratio = 3.0;
+        let comp_thresh = db_to_lin(-18.0);
+        let comp_slope = -(1.0 - 1.0 / 3.0); // 3:1
         let comp_att = coef(5.0);
         let comp_rel = coef(120.0);
 
@@ -267,13 +263,14 @@ impl Chain {
                 y = f.process(y);
             }
 
-            // 6. compressor (peak envelope, log-domain gain computer)
+            // 6. compressor (peak envelope, -18 dBFS threshold, 3:1)
             let level = y.abs();
             let c = if level > self.comp_env { comp_att } else { comp_rel };
             self.comp_env = level + c * (self.comp_env - level);
-            let over = lin_to_db(self.comp_env) - comp_thresh;
-            let gr = if over > 0.0 { db_to_lin(-over * (1.0 - 1.0 / comp_ratio)) } else { 1.0 };
-            y *= gr;
+            // same as db_to_lin(-over_db * (1 - 1/ratio)), in one powf and only above threshold
+            if self.comp_env > comp_thresh {
+                y *= (self.comp_env / comp_thresh).powf(comp_slope);
+            }
 
             // 7. limiter: instant attack, smooth release
             let peak = y.abs();

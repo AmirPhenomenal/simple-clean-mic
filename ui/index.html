@@ -7,97 +7,143 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main>
-    <section class="top">
-      <button id="power" class="power on" aria-pressed="true" title="Turn cleaning on/off">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="9" y="3" width="6" height="11" rx="3" />
-          <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6" />
-        </svg>
-        <span id="power-label">ON</span>
-      </button>
-      <div class="top-side">
-        <h1>Clean Mic</h1>
-        <p id="status" class="status">Starting…</p>
-        <div class="meter">
-          <label>Your mic</label>
-          <div class="bar"><div id="m-in"></div></div>
-        </div>
-        <div class="meter">
-          <label>What others hear</label>
-          <div class="bar"><div id="m-out" class="clean"></div></div>
-        </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <!-- mic glyph traced from the app logo: capsule, clean waveform, cradle, stand -->
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M8.5 9.6V7.5a3.5 3.5 0 0 1 7 0v2.1M8.5 12.4v.6a3.5 3.5 0 0 0 7 0v-.6" /><path d="M5.5 11h3.2l1.3 1.6L12 7.8l2 4.8 1.3-1.6h3.2" /><path d="M5.5 13.5a6.5 6.5 0 0 0 13 0M12 20v2M9.5 22h5" /></symbol>
+    <symbol id="i-input" viewBox="0 0 24 24"><path d="M9 3v4M15 3v4M7 7h10v3.5a5 5 0 0 1-10 0z" /><path d="M12 15.5V21" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></symbol>
+    <symbol id="i-ear" viewBox="0 0 24 24"><path d="M6.5 9a5.5 5.5 0 0 1 11 0c0 3-2.5 4-3.5 6s-1 4.5-3.5 4.5A3 3 0 0 1 7.5 17" /><path d="M10 9.5a2 2 0 0 1 4 0c0 1.2-1.4 1.6-1.4 2.8" /><path d="M19.5 4.5a8 8 0 0 1 1.5 4.5M21 13a8 8 0 0 1-1.5 3" /></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></symbol>
+    <symbol id="i-noise" viewBox="0 0 24 24"><path d="M3 12h3M18 12h3M7.5 8v8M10.5 5v14M13.5 8v8M16.5 10v4" /></symbol>
+  </svg>
+
+  <div class="app">
+    <header class="titlebar" data-tauri-drag-region>
+      <div class="brand" data-tauri-drag-region>
+        <img class="logo" src="logo.png" alt="" data-tauri-drag-region />
+        <h1 data-tauri-drag-region>Clean Mic</h1>
       </div>
-    </section>
+      <p id="status" class="status" data-tauri-drag-region>
+        <span class="dot"></span><span id="status-text" data-tauri-drag-region>Starting…</span>
+      </p>
+      <div class="win-buttons">
+        <button id="win-min" class="win-btn" title="Minimize" aria-label="Minimize">
+          <svg viewBox="0 0 12 12"><path d="M2 6h8" /></svg>
+        </button>
+        <button id="win-max" class="win-btn" title="Maximize" aria-label="Maximize">
+          <svg class="max" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1.5" /></svg>
+          <svg class="restore" viewBox="0 0 12 12"><rect x="2" y="4" width="6" height="6" rx="1.2" /><path d="M4.5 4V3.2C4.5 2.5 5 2 5.7 2H8.8C9.5 2 10 2.5 10 3.2v3.1c0 .7-.5 1.2-1.2 1.2H8" /></svg>
+        </button>
+        <button id="win-close" class="win-btn close" title="Close to tray (keeps running)" aria-label="Close to tray">
+          <svg viewBox="0 0 12 12"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" /></svg>
+        </button>
+      </div>
+    </header>
 
-    <div id="cable-hint" class="hint" hidden>
-      To use this in Discord, OBS, games, etc. install the free
-      <a href="https://vb-audio.com/Cable/" target="_blank">VB-Audio Virtual Cable</a>,
-      then restart Clean Mic.
-    </div>
-    <p id="use-hint" class="hint soft" hidden>
-      In Discord / OBS / games, choose <b>CABLE Output</b> as your microphone.
-    </p>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" data-tab="voice">Voice</button>
+      <button role="tab" data-tab="clean">Cleaning</button>
+      <button role="tab" data-tab="tune">Fine-tune</button>
+      <button role="tab" data-tab="settings">Settings</button>
+    </nav>
 
-    <section class="card">
-      <h2>Voice style</h2>
-      <div id="presets" class="chips" role="radiogroup"></div>
-      <p id="preset-desc" class="desc"></p>
-
-      <div class="tone">
-        <div class="tone-row">
-          <label for="t-bass">Bass <small>depth</small></label>
-          <input id="t-bass" type="range" min="-12" max="12" step="0.5" data-band="0" />
-          <output id="o-bass"></output>
-        </div>
-        <div class="tone-row">
-          <label for="t-mid">Mid <small>body</small></label>
-          <input id="t-mid" type="range" min="-12" max="12" step="0.5" data-band="2" />
-          <output id="o-mid"></output>
-        </div>
-        <div class="tone-row">
-          <label for="t-treble">Treble <small>clarity</small></label>
-          <input id="t-treble" type="range" min="-12" max="12" step="0.5" data-band="4" />
-          <output id="o-treble"></output>
-        </div>
+    <main class="content">
+      <div id="update" class="banner" hidden>
+        <p id="update-text"></p>
+        <button id="update-btn" class="btn primary">Update now</button>
       </div>
 
-      <details id="pro" class="pro">
-        <summary>Pro EQ</summary>
-        <canvas id="eq" height="170"></canvas>
-        <p class="desc">Drag a dot to shape your voice. Scroll on a dot to make it wider or narrower. Double-click to reset it.</p>
-        <div id="band-info" class="band-info"></div>
-      </details>
-    </section>
-
-    <section class="card">
-      <h2>Loudness</h2>
-      <input id="loudness" type="range" min="0" max="100" value="50" />
-      <div class="ticks"><span>Quieter</span><span>Louder</span></div>
-
-      <h2 class="gap">Background noise removal</h2>
-      <input id="strength" type="range" min="0" max="100" value="70" />
-      <div class="ticks"><span>Gentle</span><span>Strong</span></div>
-
-      <div class="row toggles">
-        <label class="switch"><input id="echo" type="checkbox" checked /><span></span> Remove speaker echo</label>
+      <div id="cable-hint" class="banner warn" hidden>
+        <p>
+          To use your clean voice in Discord, OBS and games, Clean Mic needs VB-CABLE, a free virtual audio cable.
+          <small>VB-CABLE is made by VB-Audio (www.vb-cable.com). It is donationware, all participations are welcome.</small>
+        </p>
+        <button id="cable-btn" class="btn primary">Install VB-CABLE</button>
       </div>
-      <p id="echo-desc" class="desc">Stops people from hearing themselves when you use speakers instead of headphones.</p>
 
-      <div class="row toggles">
-        <label class="switch"><input id="monitor" type="checkbox" /><span></span> Hear myself</label>
-        <button id="compare" class="ghost" title="Hold to hear your mic without any processing">Hold to hear original</button>
+      <section class="panel" id="tab-voice" role="tabpanel">
+        <div class="col">
+          <div class="levels">
+            <div class="level"><span>Your mic</span><div class="meter"><i id="m-in"></i></div></div>
+            <div class="level"><span>What others hear</span><div class="meter"><i id="m-out" class="clean"></i></div></div>
+          </div>
+          <h2>Voice style</h2>
+          <div id="presets" class="chips" role="radiogroup" aria-label="Voice style"></div>
+          <p id="preset-desc" class="desc"></p>
+        </div>
+        <div class="col">
+          <h2>Sound</h2>
+          <div id="voice-bars" class="bars"></div>
+          <p id="use-hint" class="desc" hidden>In Discord, OBS or games, choose <b>CABLE Output</b> as your microphone.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-clean" role="tabpanel" hidden>
+        <div class="col">
+          <h2>Background noise</h2>
+          <div id="clean-bars" class="bars"></div>
+          <p class="desc">Higher removes more fans, keyboard and room noise between your words.</p>
+        </div>
+        <div class="col">
+          <h2>Speakers</h2>
+          <label class="option">
+            <span class="option-text">
+              <b>Remove speaker echo</b>
+              <span id="echo-desc" class="desc">Stops people hearing themselves when you use speakers instead of headphones.</span>
+            </span>
+            <span class="switch"><input id="echo" type="checkbox" /><span></span></span>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-tune" role="tabpanel" hidden>
+        <div class="col wide">
+          <div class="row-head">
+            <h2>Equalizer</h2>
+            <button id="eq-reset" class="btn">Reset to style</button>
+          </div>
+          <canvas id="eq" height="220"></canvas>
+          <p id="band-info" class="band-info"></p>
+          <p class="desc">Drag a dot to shape your voice. Scroll on a dot to make it wider or narrower. Double-click a dot to flatten it.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-settings" role="tabpanel" hidden>
+        <div class="col">
+          <h2>Devices</h2>
+          <label class="field">Microphone<select id="input"></select></label>
+          <label class="field">Send clean voice to<select id="output"></select></label>
+        </div>
+        <div class="col">
+          <h2>App</h2>
+          <label class="option">
+            <span class="option-text">
+              <b>Start with Windows</b>
+              <span class="desc">Clean Mic starts quietly in the tray when you sign in.</span>
+            </span>
+            <span class="switch"><input id="autostart" type="checkbox" /><span></span></span>
+          </label>
+          <p class="desc">Closing the window keeps Clean Mic running in the tray, at the bottom-right of the taskbar. Right-click its icon to quit.</p>
+          <p id="version" class="desc"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dock">
+      <div class="pill">
+        <button id="input-btn" class="round" title="Choose microphone" aria-label="Choose microphone" aria-haspopup="listbox" aria-expanded="false" aria-controls="input-menu">
+          <svg><use href="#i-input" /></svg>
+        </button>
+        <button id="mic" class="mic" aria-pressed="true" title="Turn cleaning on or off">
+          <svg><use href="#i-mic" /></svg>
+        </button>
+        <button id="monitor" class="round" aria-pressed="false" title="Hear myself">
+          <svg><use href="#i-ear" /></svg>
+        </button>
       </div>
-    </section>
-
-    <details class="card devices">
-      <summary>Devices</summary>
-      <label for="input">Microphone</label>
-      <select id="input"></select>
-      <label for="output">Send clean voice to</label>
-      <select id="output"></select>
-    </details>
-  </main>
+      <div id="input-menu" class="menu" role="listbox" aria-label="Microphone" hidden></div>
+    </footer>
+  </div>
   <script src="main.js"></script>
 </body>
 </html>

@@ -1,21 +1,26 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Clean Mic",
-  "version": "0.1.0",
+  "version": "../package.json",
   "identifier": "com.simplecleanmic.app",
   "build": {
-    "frontendDist": "../ui"
+    "frontendDist": "../ui",
+    "beforeDevCommand": "node scripts/fetch-vbcable.mjs",
+    "beforeBuildCommand": "node scripts/fetch-vbcable.mjs"
   },
   "app": {
     "withGlobalTauri": true,
     "windows": [
       {
         "title": "Clean Mic",
-        "width": 440,
-        "height": 820,
-        "minWidth": 400,
-        "minHeight": 500,
-        "resizable": true
+        "width": 520,
+        "height": 800,
+        "minWidth": 380,
+        "minHeight": 580,
+        "resizable": true,
+        "visible": false,
+        "decorations": false,
+        "shadow": true
       }
     ],
     "security": { "csp": null }
@@ -23,6 +28,22 @@
   "bundle": {
     "active": true,
     "targets": ["nsis"],
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"]
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"],
+    "resources": { "vbcable/": "vbcable/" },
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "nsis": {
+        "installerHooks": "installer-hooks.nsh"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDkzOEVFQTQ0NEU5RUFFRkUKUldUK3JwNU9ST3FPazVwUGszYUNYNTQ4QWF5WFdFSElVL3ZwVkxwUWJwOTBhYloyTzN6VGtqU0kK",
+      "endpoints": [
+        "https://github.com/AmirPhenomenal/simple-clean-mic/releases/latest/download/latest.json"
+      ],
+      "windows": { "installMode": "passive" }
+    }
   }
 }

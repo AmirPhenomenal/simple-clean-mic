@@ -21,6 +21,7 @@
   <a href="https://github.com/AmirPhenomenal/simple-clean-mic/releases/latest"><b>⬇ Download Clean Mic for Windows</b></a>
   &nbsp;·&nbsp; <a href="#how-to-set-it-up">Setup</a>
   &nbsp;·&nbsp; <a href="#faq">FAQ</a>
+  &nbsp;·&nbsp; <a href="ROADMAP.md">Roadmap</a>
   &nbsp;·&nbsp; <a href="#contributing">Contribute</a>
 </p>
 
@@ -188,6 +189,8 @@ Contributions are very welcome, from bug reports and translations to DSP work. G
   or [**help wanted**](https://github.com/AmirPhenomenal/simple-clean-mic/labels/help%20wanted).
 - Ideas and questions in [Discussions](https://github.com/AmirPhenomenal/simple-clean-mic/discussions).
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
+- See what's planned in the [roadmap](ROADMAP.md): VST/CLAP plugins, recording with timed
+  transcripts, and a live transcript to text.
 
 **If Clean Mic made your calls sound better, please ⭐ star the repo.** It helps other people
 find it.

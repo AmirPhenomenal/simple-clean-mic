@@ -2,6 +2,23 @@
   "name": "simple-clean-mic",
   "private": true,
   "version": "0.1.0",
+  "description": "Free, open-source AI noise cancellation for your microphone on Windows: removes background noise and echo for Discord, OBS, Zoom and games.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AmirPhenomenal/simple-clean-mic.git"
+  },
+  "keywords": [
+    "noise-cancellation",
+    "noise-suppression",
+    "microphone",
+    "rnnoise",
+    "discord",
+    "obs",
+    "windows",
+    "tauri",
+    "rust"
+  ],
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",

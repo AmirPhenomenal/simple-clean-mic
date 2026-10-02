@@ -1,0 +1,42 @@
+name: Bug report
+description: Something doesn't work or sounds wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Clean Mic
+        2. ...
+  - type: input
+    id: version
+    attributes:
+      label: Clean Mic version
+      description: Shown at the bottom of the Settings tab.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 23H2
+  - type: input
+    id: mic
+    attributes:
+      label: Microphone and app
+      description: Which mic, and which app you use it in (Discord, OBS, ...).
+      placeholder: Blue Yeti, Discord
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots, a short audio clip, the error shown in the app...

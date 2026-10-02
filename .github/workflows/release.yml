@@ -37,6 +37,9 @@ jobs:
 
       - run: npm ci
 
+      # tauri-build checks that the bundled resources exist, even for tests
+      - run: node scripts/fetch-vbcable.mjs
+
       - name: Run tests
         working-directory: src-tauri
         run: cargo test --release
